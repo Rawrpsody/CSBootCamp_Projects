@@ -1,0 +1,35 @@
+---
+
+- name: Webserver Config
+  hosts: webservers
+  become: true
+  tasks:
+  - name: docker.io (check-install)
+    apt:
+      update_cache: yes
+      name: docker.io
+      state: present
+
+  - name: python3-pip (check-install)
+    apt:
+      force_apt_get: yes
+      name: python3-pip
+      state: present
+
+  - name: docker (check-install)
+    pip:
+      name: docker
+      state: present
+
+  - name: docker web container (pull-enable-restart-port)
+    docker_container:
+      name: dvwa
+      image: cyberxsecurity/dvwa
+      state: started
+      restart_policy: always
+      published_ports: 80:80
+
+  - name: Enable docker
+    systemd:
+      name: docker
+      enabled: yes
